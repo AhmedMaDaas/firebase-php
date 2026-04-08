@@ -17,7 +17,7 @@ use Throwable;
 /**
  * @internal
  */
-final readonly class AppInstanceApiClient
+final class AppInstanceApiClient
 {
     public function __construct(
         private ClientInterface $client,

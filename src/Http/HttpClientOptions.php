@@ -11,7 +11,7 @@ use Psr\Http\Message\RequestInterface;
 
 use function is_callable;
 
-final readonly class HttpClientOptions
+final class HttpClientOptions
 {
     /**
      * @param array<non-empty-string, mixed> $guzzleConfig

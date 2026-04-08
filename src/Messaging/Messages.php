@@ -13,7 +13,7 @@ use function count;
 /**
  * @implements IteratorAggregate<Message>
  */
-final readonly class Messages implements Countable, IteratorAggregate
+final class Messages implements Countable, IteratorAggregate
 {
     /**
      * @var Message[]

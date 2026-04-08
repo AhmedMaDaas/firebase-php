@@ -36,7 +36,7 @@ use function array_map;
 /**
  * @internal
  */
-final readonly class Messaging implements Contract\Messaging
+final class Messaging implements Contract\Messaging
 {
     public function __construct(
         private ApiClient $messagingApi,

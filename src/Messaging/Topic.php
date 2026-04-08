@@ -13,7 +13,7 @@ use function preg_replace;
 use function sprintf;
 use function trim;
 
-final readonly class Topic implements JsonSerializable, Stringable
+final class Topic implements JsonSerializable, Stringable
 {
     /**
      * @param non-empty-string $value

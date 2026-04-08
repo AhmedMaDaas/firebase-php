@@ -6,7 +6,7 @@ namespace Kreait\Firebase\Messaging;
 
 use Beste\Json;
 
-final readonly class RawMessageFromArray implements Message
+final class RawMessageFromArray implements Message
 {
     /**
      * @param array<mixed> $data

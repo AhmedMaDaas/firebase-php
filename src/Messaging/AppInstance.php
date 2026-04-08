@@ -10,7 +10,7 @@ use Kreait\Firebase\Util\DT;
 /**
  * @see https://developers.google.com/instance-id/reference/server#results
  */
-final readonly class AppInstance implements JsonSerializable
+final class AppInstance implements JsonSerializable
 {
     /**
      * @param array<string, mixed> $rawData

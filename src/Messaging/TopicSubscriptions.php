@@ -14,7 +14,7 @@ use function count;
 /**
  * @implements IteratorAggregate<TopicSubscription>
  */
-final readonly class TopicSubscriptions implements Countable, IteratorAggregate
+final class TopicSubscriptions implements Countable, IteratorAggregate
 {
     /**
      * @var list<TopicSubscription>

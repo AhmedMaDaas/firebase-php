@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase;
 
-use Beste\Cache\InMemoryCache;
 use Beste\Clock\SystemClock;
 use Beste\Clock\WrappingClock;
 use Firebase\JWT\CachedKeySet;
+use Google\Auth\Cache\MemoryCacheItemPool;
 use Google\Auth\ApplicationDefaultCredentials;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\FetchAuthTokenCache;
@@ -41,9 +41,6 @@ use Kreait\Firebase\JWT\IdTokenVerifier;
 use Kreait\Firebase\JWT\SessionCookieVerifier;
 use Kreait\Firebase\Messaging\AppInstanceApiClient;
 use Kreait\Firebase\Messaging\RequestFactory;
-use Kreait\Firebase\Valinor\Mapper;
-use Kreait\Firebase\Valinor\Normalizer;
-use Kreait\Firebase\Valinor\Source;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Clock\ClockInterface;
 use Psr\Http\Message\UriInterface;
@@ -57,7 +54,7 @@ use function trim;
 
 final class Factory
 {
-    public const array API_CLIENT_SCOPES = [
+    public const API_CLIENT_SCOPES = [
         'https://www.googleapis.com/auth/iam',
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/firebase',
@@ -118,19 +115,11 @@ final class Factory
      */
     private array $firestoreClientConfig = [];
 
-    private mixed $mapperCache = null;
-
-    private mixed $normalizerCache = null;
-
-    private ?Mapper $mapper = null;
-
-    private ?Normalizer $normalizer = null;
-
     public function __construct()
     {
         $this->clock = SystemClock::create();
 
-        $this->defaultCache = new InMemoryCache($this->clock);
+        $this->defaultCache = new MemoryCacheItemPool();
         $this->httpFactory = new HttpFactory();
         $this->httpClientOptions = HttpClientOptions::default();
         $this->errorResponseParser = new ErrorResponseParser();
@@ -262,24 +251,6 @@ final class Factory
     {
         $factory = clone $this;
         $factory->keySetCache = $cache;
-
-        return $factory;
-    }
-
-    public function withMapperCache(mixed $cache): self
-    {
-        $factory = clone $this;
-        $factory->mapperCache = $cache;
-        $factory->mapper = null;
-
-        return $factory;
-    }
-
-    public function withNormalizerCache(mixed $cache): self
-    {
-        $factory = clone $this;
-        $factory->normalizerCache = $cache;
-        $factory->normalizer = null;
 
         return $factory;
     }
@@ -603,16 +574,6 @@ final class Factory
         return $verifier->withExpectedTenantId($this->tenantId);
     }
 
-    private function getMapper(): Mapper
-    {
-        return $this->mapper ??= new Mapper($this->mapperCache);
-    }
-
-    private function getNormalizer(): Normalizer
-    {
-        return $this->normalizer ??= new Normalizer($this->normalizerCache);
-    }
-
     private function createSessionCookieVerifier(): SessionCookieVerifier
     {
         return SessionCookieVerifier::createWithProjectIdAndCache($this->getProjectId(), $this->verifierCache ?? $this->defaultCache);
@@ -657,10 +618,38 @@ final class Factory
 
     private function mapServiceAccount(mixed $value): ServiceAccount
     {
-        return $this->getMapper()
-            ->allowSuperfluousKeys()
-            ->snakeToCamelCase()
-            ->map(ServiceAccount::class, Source::parse($value));
+        if (is_string($value)) {
+            if (is_file($value)) {
+                $contents = file_get_contents($value);
+
+                if ($contents === false) {
+                    throw new InvalidArgumentException('Unable to read the service account file');
+                }
+
+                $value = json_decode($contents, true);
+            } else {
+                $value = json_decode($value, true);
+            }
+        }
+
+        if (!is_array($value)) {
+            throw new InvalidArgumentException('The service account must be a JSON string, a file path, or an array');
+        }
+
+        return new ServiceAccount(
+            $value['type'] ?? '',
+            $value['project_id'] ?? '',
+            $value['client_email'] ?? '',
+            $value['private_key'] ?? '',
+            $value['client_id'] ?? null,
+            $value['private_key_id'] ?? null,
+            $value['auth_uri'] ?? null,
+            $value['token_uri'] ?? null,
+            $value['auth_provider_x509_cert_url'] ?? null,
+            $value['client_x509_cert_url'] ?? null,
+            $value['quota_project_id'] ?? null,
+            $value['universe_domain'] ?? null
+        );
     }
 
     /**
@@ -668,8 +657,19 @@ final class Factory
      */
     private function normalizeServiceAccount(ServiceAccount $serviceAccount): array
     {
-        return $this->getNormalizer()
-            ->camelToSnakeCase()
-            ->toArray($serviceAccount);
+        return [
+            'type' => $serviceAccount->type,
+            'project_id' => $serviceAccount->projectId,
+            'client_email' => $serviceAccount->clientEmail,
+            'private_key' => $serviceAccount->privateKey,
+            'client_id' => $serviceAccount->clientId,
+            'private_key_id' => $serviceAccount->privateKeyId,
+            'auth_uri' => $serviceAccount->authUri,
+            'token_uri' => $serviceAccount->tokenUri,
+            'auth_provider_x509_cert_url' => $serviceAccount->authProviderX509CertUrl,
+            'client_x509_cert_url' => $serviceAccount->clientX509CertUrl,
+            'quota_project_id' => $serviceAccount->quotaProjectId,
+            'universe_domain' => $serviceAccount->universeDomain,
+        ];
     }
 }

@@ -21,7 +21,7 @@ final class SendReport
 
     private ?MessagingException $error = null;
 
-    private function __construct(private readonly MessageTarget $target)
+    private function __construct(private MessageTarget $target)
     {
     }
 

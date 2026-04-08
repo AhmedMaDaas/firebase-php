@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 /**
  * @internal
  */
-final readonly class RequestFactory
+final class RequestFactory
 {
     private bool $environmentSupportsHTTP2;
 

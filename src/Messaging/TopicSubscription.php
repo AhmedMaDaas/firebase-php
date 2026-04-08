@@ -9,7 +9,7 @@ use JsonSerializable;
 
 use const DATE_ATOM;
 
-final readonly class TopicSubscription implements JsonSerializable
+final class TopicSubscription implements JsonSerializable
 {
     public function __construct(
         private Topic $topic,

@@ -13,7 +13,7 @@ use function mb_substr_count;
 use function sprintf;
 use function str_replace;
 
-final readonly class Condition implements JsonSerializable, Stringable
+final class Condition implements JsonSerializable, Stringable
 {
     /**
      * @param non-empty-string $value

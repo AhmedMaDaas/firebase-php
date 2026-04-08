@@ -25,11 +25,11 @@ use function array_key_exists;
  *     live_activity_token?: non-empty-string
  * }
  */
-final readonly class ApnsConfig implements JsonSerializable
+final class ApnsConfig implements JsonSerializable
 {
-    private const string PRIORITY_CONSERVE_POWER = '5';
+    private const PRIORITY_CONSERVE_POWER = '5';
 
-    private const string PRIORITY_IMMEDIATE = '10';
+    private const PRIORITY_IMMEDIATE = '10';
 
     /**
      * @param array<non-empty-string, non-empty-string> $headers

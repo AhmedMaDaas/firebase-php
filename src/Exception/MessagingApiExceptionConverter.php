@@ -28,7 +28,7 @@ use function is_numeric;
 /**
  * @internal
  */
-final readonly class MessagingApiExceptionConverter
+final class MessagingApiExceptionConverter
 {
     private ErrorResponseParser $responseParser;
 

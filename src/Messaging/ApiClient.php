@@ -13,7 +13,7 @@ use Psr\Http\Message\RequestInterface;
 /**
  * @internal
  */
-final readonly class ApiClient
+final class ApiClient
 {
     public function __construct(
         private ClientInterface $client,

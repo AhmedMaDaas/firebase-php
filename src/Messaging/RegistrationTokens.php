@@ -16,7 +16,7 @@ use function is_string;
 /**
  * @implements IteratorAggregate<RegistrationToken>
  */
-final readonly class RegistrationTokens implements Countable, IteratorAggregate
+final class RegistrationTokens implements Countable, IteratorAggregate
 {
     /**
      * @var list<RegistrationToken>
