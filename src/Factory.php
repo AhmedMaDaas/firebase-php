@@ -454,7 +454,7 @@ final class Factory
         $config ??= [];
         $middlewares ??= [];
 
-        $config = [...$this->httpClientOptions->guzzleConfig(), ...$config];
+        $config = array_merge($this->httpClientOptions->guzzleConfig(), $config);
 
         $handler = HandlerStack::create($config['handler'] ?? null);
 
